@@ -45,9 +45,9 @@ function Navbar() {
           <a href="#avant-apres" onClick={close}>Avant/Après</a>
           <a href="#avis" onClick={close}>Avis</a>
           <a href="#faq" onClick={close}>FAQ</a>
-          <a href="tel:+393515162288" className="btn btn--dark nav__menu-cta" onClick={close}>Réserver</a>
+          <a href="tel:+393515162288" className="btn btn--dark nav__menu-cta" onClick={close}>Nous appeler</a>
         </nav>
-        <a href="tel:+393515162288" className="btn btn--dark nav__cta">Réserver</a>
+        <a href="tel:+393515162288" className="btn btn--dark nav__cta">Nous appeler</a>
         <button
           className={`nav__burger${open ? ' nav__burger--open' : ''}`}
           onClick={() => setOpen(v => !v)}
@@ -81,7 +81,7 @@ function Hero() {
         </p>
         <div className="hero__actions">
           <a href="tel:+393515162288" className="btn btn--light btn--lg">
-            Réserver · dès CHF 110.–
+            Nous appeler · dès CHF 110.–
           </a>
           <a href="#services" className="btn btn--ghost btn--lg">
             Découvrir nos services
@@ -203,7 +203,7 @@ const PLANS = [
       'Vitres intérieures',
     ],
     options: ['Shampoing des sièges', 'Shampoing des tapis', 'Nettoyage extérieur'],
-    cta: 'Réserver ce nettoyage',
+    cta: 'Demander ce nettoyage',
     featured: false,
   },
   {
@@ -219,7 +219,7 @@ const PLANS = [
       'Désinfection & parfum durable',
     ],
     options: ["Retrait des poils d'animaux", 'Suppression des mauvaises odeurs'],
-    cta: 'Réserver le Premium',
+    cta: 'Demander le Premium',
     featured: true,
   },
   {
@@ -442,7 +442,7 @@ const REVIEWS = [
   { name: 'Sophie L.', rating: 5, text: "Intervention rapide et soignée. Les techniciens sont ponctuels et le résultat dépasse toutes mes attentes. Je reviendrai sans hésiter !" },
   { name: 'Thomas K.', rating: 5, text: "Le nettoyage premium vaut chaque franc suisse. Mon SUV ressemble à un véhicule neuf sorti du showroom. Travail vraiment remarquable." },
   { name: 'Isabelle R.', rating: 5, text: "Très professionnel, ponctuels et courtois. L'intérieur de ma voiture n'a jamais été aussi propre. Je suis totalement conquise." },
-  { name: 'Julien M.', rating: 5, text: "Parfait de A à Z. Réservation simple, équipe à l'heure, travail remarquable. Paiement après intervention – un vrai gage de confiance." },
+  { name: 'Julien M.', rating: 5, text: "Parfait de A à Z. Contact simple, équipe à l'heure, travail remarquable. Paiement après intervention – un vrai gage de confiance." },
   { name: 'Claire B.', rating: 5, text: "Excellent rapport qualité-prix. Résultat visible immédiatement. Je suis bluffée par le niveau de soin apporté à chaque détail." },
 ]
 
@@ -535,9 +535,9 @@ function CtaSection() {
     <section className="cta" ref={ref}>
       <div className={`cta__inner container${inView ? ' visible' : ''}`}>
         <h2>Prêt à redonner de l&apos;éclat<br />à votre véhicule ?</h2>
-        <p>Contactez-nous et recevez une confirmation rapide.<br />Déjà plus de 200 véhicules traités à Zurich.</p>
+        <p>Appelez-nous ou envoyez un message.<br />Déjà plus de 200 véhicules traités à Zurich.</p>
         <a href="tel:+393515162288" className="btn btn--light btn--lg">
-          Réserver mon intervention
+          Nous contacter
         </a>
         <p className="cta__note">Disponibilités limitées chaque semaine.</p>
         <div className="cta__trust">
