@@ -204,6 +204,12 @@
   display: none;
 }
 
+.nav__instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .nav__cta {
   flex-shrink: 0;
   padding: 10px 22px;
@@ -965,6 +971,20 @@
 }
 .footer__phone:hover {
   opacity: 0.8;
+}
+
+.footer__instagram {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 10px;
+  transition: color 0.2s var(--ease);
+}
+.footer__instagram:hover {
+  color: var(--white);
 }
 
 .footer__nav h4 {

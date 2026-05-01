@@ -45,6 +45,14 @@ function Navbar() {
           <a href="#avant-apres" onClick={close}>Avant/Après</a>
           <a href="#avis" onClick={close}>Avis</a>
           <a href="#faq" onClick={close}>FAQ</a>
+          <a href="https://www.instagram.com/Infinityclean.ch" target="_blank" rel="noreferrer" className="nav__instagram" onClick={close}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" strokeWidth="0" />
+            </svg>
+            Instagram
+          </a>
           <a href="tel:+393515162288" className="btn btn--dark nav__menu-cta" onClick={close}>Nous appeler</a>
         </nav>
         <a href="tel:+393515162288" className="btn btn--dark nav__cta">Nous appeler</a>
@@ -559,6 +567,19 @@ function Footer() {
           <span className="footer__logo">Car Clean</span>
           <p>Service premium de nettoyage voiture à domicile à Zurich et ses alentours.</p>
           <a href="tel:+393515162288" className="footer__phone">+39 351 516 2288</a>
+          <a
+            href="https://www.instagram.com/Infinityclean.ch"
+            target="_blank"
+            rel="noreferrer"
+            className="footer__instagram"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" aria-hidden="true">
+              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+              <circle cx="12" cy="12" r="4" />
+              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" strokeWidth="0" />
+            </svg>
+            @Infinityclean.ch
+          </a>
         </div>
         <div className="footer__nav">
           <h4>Navigation</h4>
@@ -575,6 +596,9 @@ function Footer() {
           <ul>
             <li><a href="tel:+393515162288">Appeler</a></li>
             <li><a href="mailto:info@carclean.ch">info@carclean.ch</a></li>
+            <li>
+              <a href="https://www.instagram.com/Infinityclean.ch" target="_blank" rel="noreferrer">Instagram</a>
+            </li>
             <li><span>Zurich, Suisse</span></li>
           </ul>
         </div>
