@@ -1,0 +1,610 @@
+import { useState, useEffect, useRef } from 'react'
+import './App.css'
+
+// ─── Intersection Observer Hook ──────────────────────────────────────────────
+function useInView(threshold = 0.12) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.unobserve(entry.target)
+        }
+      },
+      { threshold }
+    )
+    const el = ref.current
+    if (el) observer.observe(el)
+    return () => { if (el) observer.unobserve(el) }
+  }, [threshold])
+  return [ref, inView]
+}
+
+// ─── Navbar ──────────────────────────────────────────────────────────────────
+function Navbar() {
+  const [scrolled, setScrolled] = useState(false)
+  const [open, setOpen] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  const close = () => setOpen(false)
+
+  return (
+    <header className={`nav${scrolled ? ' nav--scrolled' : ''}`}>
+      <div className="nav__inner container">
+        <a href="#top" className="nav__logo">Car Clean</a>
+        <nav className={`nav__menu${open ? ' nav__menu--open' : ''}`}>
+          <a href="#services" onClick={close}>Services</a>
+          <a href="#tarifs" onClick={close}>Tarifs</a>
+          <a href="#avant-apres" onClick={close}>Avant/Après</a>
+          <a href="#avis" onClick={close}>Avis</a>
+          <a href="#faq" onClick={close}>FAQ</a>
+          <a href="tel:+393515162288" className="btn btn--dark nav__menu-cta" onClick={close}>Réserver</a>
+        </nav>
+        <a href="tel:+393515162288" className="btn btn--dark nav__cta">Réserver</a>
+        <button
+          className={`nav__burger${open ? ' nav__burger--open' : ''}`}
+          onClick={() => setOpen(v => !v)}
+          aria-label="Menu"
+        >
+          <span /><span /><span />
+        </button>
+      </div>
+    </header>
+  )
+}
+
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+function Hero() {
+  return (
+    <section className="hero" id="top">
+      <div className="hero__overlay" />
+      <div className="hero__inner container">
+        <div className="hero__badge">
+          <span className="hero__stars" aria-hidden="true">★★★★★</span>{' '}
+          5.0 Google &nbsp;·&nbsp; 200+ véhicules traités à Zurich
+        </div>
+        <h1 className="hero__title">
+          Nettoyage voiture<br />
+          <em>à domicile</em><br />
+          à Zurich.
+        </h1>
+        <p className="hero__sub">
+          Un soin professionnel, directement chez vous.<br />
+          Résultat visible immédiatement.
+        </p>
+        <div className="hero__actions">
+          <a href="tel:+393515162288" className="btn btn--light btn--lg">
+            Réserver · dès CHF 110.–
+          </a>
+          <a href="#services" className="btn btn--ghost btn--lg">
+            Découvrir nos services
+          </a>
+        </div>
+        <div className="hero__trust">
+          <span>✓ Sans engagement</span>
+          <span>✓ Paiement après prestation</span>
+          <span>✓ Résultat garanti</span>
+        </div>
+      </div>
+      <a href="#features" className="hero__scroll" aria-label="Défiler">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M8 12l4 4 4-4" />
+        </svg>
+      </a>
+    </section>
+  )
+}
+
+// ─── Features ────────────────────────────────────────────────────────────────
+const FEATURES = [
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28">
+        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+      </svg>
+    ),
+    title: 'Intervention à domicile',
+    desc: "Nous venons directement chez vous, à l'heure convenue. Aucun déplacement de votre part.",
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28">
+        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    title: 'Produits professionnels',
+    desc: 'Produits certifiés Gtechniq & Gyeon, adaptés à chaque matériau pour un résultat optimal.',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28">
+        <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+      </svg>
+    ),
+    title: 'Travail méticuleux',
+    desc: 'Chaque détail compte. Nous ne faisons aucun compromis sur la qualité du travail rendu.',
+  },
+  {
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="28" height="28">
+        <path d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+    title: 'Résultat immédiat',
+    desc: "Votre véhicule retrouve l'état neuf en quelques heures. Résultat visible dès la fin de l'intervention.",
+  },
+]
+
+function Features() {
+  const [ref, inView] = useInView()
+  return (
+    <section className="features section" id="features" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">Notre approche</span>
+          <h2>Un soin appliqué,<br />sans compromis.</h2>
+        </div>
+        <div className={`features__grid${inView ? ' visible' : ''}`}>
+          {FEATURES.map((f, i) => (
+            <div key={f.title} className="feature-card" style={{ '--delay': `${i * 0.1}s` }}>
+              <div className="feature-card__icon">{f.icon}</div>
+              <h3>{f.title}</h3>
+              <p>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Stats Bar ────────────────────────────────────────────────────────────────
+function StatsBar() {
+  const [ref, inView] = useInView()
+  return (
+    <div className={`stats-bar${inView ? ' visible' : ''}`} ref={ref}>
+      <div className="container stats-bar__inner">
+        {[
+          { num: '200+', label: 'Véhicules traités' },
+          { num: '5.0 ★', label: 'Note Google' },
+          { num: '100%', label: 'Satisfaction clients' },
+          { num: '<2h', label: 'Confirmation rapide' },
+        ].map((s, i) => (
+          <div key={s.label} className="stat" style={{ '--delay': `${i * 0.08}s` }}>
+            <span className="stat__num">{s.num}</span>
+            <span className="stat__label">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ─── Services / Pricing ───────────────────────────────────────────────────────
+const PLANS = [
+  {
+    name: 'Nettoyage Simple',
+    price: 'CHF 110.–',
+    duration: '~1h',
+    desc: 'Idéal pour un entretien régulier de votre véhicule.',
+    features: [
+      "Aspiration complète de l'habitacle",
+      'Nettoyage du tableau de bord',
+      'Nettoyage du coffre',
+      'Vitres intérieures',
+    ],
+    options: ['Shampoing des sièges', 'Shampoing des tapis', 'Nettoyage extérieur'],
+    cta: 'Réserver ce nettoyage',
+    featured: false,
+  },
+  {
+    name: 'Entretien Premium',
+    price: 'CHF 249.–',
+    duration: '~3h',
+    desc: 'Pour une remise à neuf complète, sans compromis.',
+    features: [
+      'Tout le contenu du Simple',
+      'Shampoing en profondeur',
+      'Traitement cuir & alcantara',
+      'Nettoyage vapeur des vitres',
+      'Désinfection & parfum durable',
+    ],
+    options: ["Retrait des poils d'animaux", 'Suppression des mauvaises odeurs'],
+    cta: 'Réserver le Premium',
+    featured: true,
+  },
+  {
+    name: 'Protection Céramique',
+    price: "CHF 1'190.–",
+    duration: '~1 journée',
+    desc: 'Un bouclier invisible pour protéger votre carrosserie 2 à 5 ans.',
+    features: [
+      'Décontamination complète',
+      'Polissage de préparation',
+      'Revêtement céramique Gtechniq',
+      'Effet hydrophobe ultra-performant',
+      'Protection UV longue durée',
+    ],
+    options: [],
+    cta: 'Demander un devis',
+    featured: false,
+  },
+]
+
+function Services() {
+  const [ref, inView] = useInView()
+  return (
+    <section className="services section section--grey" id="tarifs" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">Nos formules</span>
+          <h2>Choisissez votre<br />niveau de soin.</h2>
+          <p className="section__sub">
+            Chaque formule est conçue pour vous offrir le meilleur résultat selon l&apos;état de votre véhicule.
+          </p>
+        </div>
+        <div className={`plans__grid${inView ? ' visible' : ''}`}>
+          {PLANS.map((plan, i) => (
+            <div
+              key={plan.name}
+              className={`plan${plan.featured ? ' plan--featured' : ''}`}
+              style={{ '--delay': `${i * 0.15}s` }}
+            >
+              {plan.featured && <div className="plan__badge">Le plus choisi</div>}
+              <div className="plan__top">
+                <h3>{plan.name}</h3>
+                <p>{plan.desc}</p>
+              </div>
+              <div className="plan__price">
+                <span>Dès {plan.price}</span>
+                <small>Durée estimée {plan.duration}</small>
+              </div>
+              <ul className="plan__features">
+                {plan.features.map((f) => (
+                  <li key={f}>
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              {plan.options.length > 0 && (
+                <div className="plan__options">
+                  <p>Options disponibles</p>
+                  <ul>
+                    {plan.options.map((o) => (
+                      <li key={o}>
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                          <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
+                        </svg>
+                        {o}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <a
+                href="tel:+393515162288"
+                className={`btn ${plan.featured ? 'btn--dark' : 'btn--outline'} btn--full`}
+              >
+                {plan.cta}
+              </a>
+            </div>
+          ))}
+        </div>
+        <div className="services__trust">
+          <span>✓ Paiement après intervention</span>
+          <span>✓ Confirmation sous 2h</span>
+          <span>✓ Intervention à domicile</span>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Before / After ───────────────────────────────────────────────────────────
+function BeforeAfter() {
+  const [pos, setPos] = useState(50)
+  const isDragging = useRef(false)
+  const sliderRef = useRef(null)
+  const [ref, inView] = useInView()
+
+  const getPos = (clientX) => {
+    if (!sliderRef.current) return
+    const rect = sliderRef.current.getBoundingClientRect()
+    setPos(Math.max(2, Math.min(98, ((clientX - rect.left) / rect.width) * 100)))
+  }
+
+  useEffect(() => {
+    const onMove = (e) => { if (isDragging.current) getPos(e.clientX) }
+    const onUp = () => { isDragging.current = false }
+    const onTouchMove = (e) => {
+      if (isDragging.current) { e.preventDefault(); getPos(e.touches[0].clientX) }
+    }
+    const onTouchEnd = () => { isDragging.current = false }
+    document.addEventListener('mousemove', onMove)
+    document.addEventListener('mouseup', onUp)
+    document.addEventListener('touchmove', onTouchMove, { passive: false })
+    document.addEventListener('touchend', onTouchEnd)
+    return () => {
+      document.removeEventListener('mousemove', onMove)
+      document.removeEventListener('mouseup', onUp)
+      document.removeEventListener('touchmove', onTouchMove)
+      document.removeEventListener('touchend', onTouchEnd)
+    }
+  }, [])
+
+  return (
+    <section className="ba section" id="avant-apres" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">Avant / Après</span>
+          <h2>Le résultat parle<br />de lui-même.</h2>
+        </div>
+        <div className={`ba__wrap${inView ? ' visible' : ''}`}>
+          {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions */}
+          <div
+            className="ba__slider"
+            ref={sliderRef}
+            onMouseDown={(e) => { isDragging.current = true; getPos(e.clientX) }}
+            onTouchStart={(e) => { isDragging.current = true; getPos(e.touches[0].clientX) }}
+          >
+            <div className="ba__img ba__before">
+              <img
+                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=900&q=80"
+                alt="Avant nettoyage"
+                draggable="false"
+              />
+              <span className="ba__tag">AVANT</span>
+            </div>
+            <div className="ba__img ba__after" style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}>
+              <img
+                src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80"
+                alt="Après nettoyage"
+                draggable="false"
+              />
+              <span className="ba__tag ba__tag--after">APRÈS</span>
+            </div>
+            <div className="ba__line" style={{ left: `${pos}%` }}>
+              <button
+                className="ba__handle"
+                aria-label="Déplacer le curseur de comparaison"
+                onMouseDown={(e) => { e.stopPropagation(); isDragging.current = true }}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="20" height="20">
+                  <path d="M9 18l-6-6 6-6M15 6l6 6-6 6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <p className="ba__hint">← Faites glisser pour comparer →</p>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── How It Works ─────────────────────────────────────────────────────────────
+const STEPS = [
+  {
+    num: '01',
+    title: 'Choisissez votre formule',
+    desc: "Appelez-nous ou envoyez un message. Nous vous conseillons la formule adaptée à votre véhicule et votre budget.",
+  },
+  {
+    num: '02',
+    title: 'Nous intervenons chez vous',
+    desc: "À l'heure convenue, notre équipe arrive avec tout le matériel professionnel. Vous n'avez rien à prévoir.",
+  },
+  {
+    num: '03',
+    title: 'Profitez du résultat',
+    desc: "Votre voiture retrouve l'état neuf. Vous payez uniquement après votre entière satisfaction.",
+  },
+]
+
+function HowItWorks() {
+  const [ref, inView] = useInView()
+  return (
+    <section className="steps section section--grey" id="services" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">Comment ça fonctionne</span>
+          <h2>Simple, rapide<br />et sans contrainte.</h2>
+        </div>
+        <div className={`steps__grid${inView ? ' visible' : ''}`}>
+          {STEPS.map((step, i) => (
+            <div key={step.num} className="step" style={{ '--delay': `${i * 0.15}s` }}>
+              <span className="step__num">{step.num}</span>
+              <h3>{step.title}</h3>
+              <p>{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+const REVIEWS = [
+  { name: 'Marc D.', rating: 5, text: "Service impeccable ! La voiture brille comme neuve. Je recommande vivement à tous ceux qui cherchent un résultat professionnel sans se déplacer." },
+  { name: 'Sophie L.', rating: 5, text: "Intervention rapide et soignée. Les techniciens sont ponctuels et le résultat dépasse toutes mes attentes. Je reviendrai sans hésiter !" },
+  { name: 'Thomas K.', rating: 5, text: "Le nettoyage premium vaut chaque franc suisse. Mon SUV ressemble à un véhicule neuf sorti du showroom. Travail vraiment remarquable." },
+  { name: 'Isabelle R.', rating: 5, text: "Très professionnel, ponctuels et courtois. L'intérieur de ma voiture n'a jamais été aussi propre. Je suis totalement conquise." },
+  { name: 'Julien M.', rating: 5, text: "Parfait de A à Z. Réservation simple, équipe à l'heure, travail remarquable. Paiement après intervention – un vrai gage de confiance." },
+  { name: 'Claire B.', rating: 5, text: "Excellent rapport qualité-prix. Résultat visible immédiatement. Je suis bluffée par le niveau de soin apporté à chaque détail." },
+]
+
+function Reviews() {
+  const [ref, inView] = useInView()
+  return (
+    <section className="reviews section" id="avis" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">Avis clients</span>
+          <h2>Noté 5★ par<br />nos clients.</h2>
+          <p className="section__sub">5.0 / 5 · Basé sur 200+ interventions à Zurich</p>
+        </div>
+        <div className={`reviews__grid${inView ? ' visible' : ''}`}>
+          {REVIEWS.map((r, i) => (
+            <div key={r.name} className="review" style={{ '--delay': `${i * 0.08}s` }}>
+              <div className="review__stars">{'★'.repeat(r.rating)}</div>
+              <p>&ldquo;{r.text}&rdquo;</p>
+              <strong>— {r.name}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+const FAQS = [
+  {
+    q: "Combien de temps dure l'intervention ?",
+    a: "La durée varie selon la formule. Le nettoyage Simple dure environ 1 heure, l'Entretien Premium environ 3 heures. Nous vous donnons une estimation précise lors de la réservation.",
+  },
+  {
+    q: "Dois-je être présent pendant l'intervention ?",
+    a: "Non, votre présence n'est pas obligatoire. Il suffit de nous laisser accès au véhicule. Nous vous prévenons dès que le travail est terminé.",
+  },
+  {
+    q: "Comment se passe le paiement ?",
+    a: "Le paiement s'effectue uniquement après l'intervention et votre satisfaction. Nous acceptons Twint, virement bancaire ou espèces.",
+  },
+  {
+    q: "Intervenez-vous dans tout Zurich ?",
+    a: "Oui, nous intervenons dans tout Zurich et ses alentours. Pour les zones plus éloignées, des frais de déplacement peuvent s'appliquer selon la distance.",
+  },
+  {
+    q: "Faut-il une prise électrique ou de l'eau ?",
+    a: "Idéalement oui, mais nous pouvons nous adapter. Pour le nettoyage intérieur, nous n'avons généralement pas besoin d'eau. Pour l'extérieur, une prise d'eau facilite le travail.",
+  },
+  {
+    q: "Le nettoyage est-il adapté à tous les véhicules ?",
+    a: "Oui, nous traitons tous types de véhicules : citadines, SUV, berlines et sportives. Nos produits sont adaptés à chaque type de matériau et revêtement.",
+  },
+]
+
+function FaqSection() {
+  const [open, setOpen] = useState(null)
+  const [ref, inView] = useInView()
+  return (
+    <section className="faq section section--grey" id="faq" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">FAQ</span>
+          <h2>Questions<br />fréquentes.</h2>
+        </div>
+        <div className={`faq__list${inView ? ' visible' : ''}`}>
+          {FAQS.map((item, i) => (
+            <div key={item.q} className={`faq__item${open === i ? ' faq__item--open' : ''}`}>
+              <button className="faq__q" onClick={() => setOpen(open === i ? null : i)}>
+                <span>{item.q}</span>
+                <svg className="faq__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+              <div className="faq__a">
+                <p>{item.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── CTA ──────────────────────────────────────────────────────────────────────
+function CtaSection() {
+  const [ref, inView] = useInView()
+  return (
+    <section className="cta" ref={ref}>
+      <div className={`cta__inner container${inView ? ' visible' : ''}`}>
+        <h2>Prêt à redonner de l&apos;éclat<br />à votre véhicule ?</h2>
+        <p>Contactez-nous et recevez une confirmation rapide.<br />Déjà plus de 200 véhicules traités à Zurich.</p>
+        <a href="tel:+393515162288" className="btn btn--light btn--lg">
+          Réserver mon intervention
+        </a>
+        <p className="cta__note">Disponibilités limitées chaque semaine.</p>
+        <div className="cta__trust">
+          <span>✓ Paiement après intervention</span>
+          <span>✓ Confirmation rapide</span>
+          <span>✓ Intervention à domicile</span>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container footer__inner">
+        <div className="footer__brand">
+          <span className="footer__logo">Car Clean</span>
+          <p>Service premium de nettoyage voiture à domicile à Zurich et ses alentours.</p>
+          <a href="tel:+393515162288" className="footer__phone">+39 351 516 2288</a>
+        </div>
+        <div className="footer__nav">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="#features">Notre approche</a></li>
+            <li><a href="#tarifs">Tarifs</a></li>
+            <li><a href="#avant-apres">Avant / Après</a></li>
+            <li><a href="#avis">Avis clients</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div className="footer__nav">
+          <h4>Contact</h4>
+          <ul>
+            <li><a href="tel:+393515162288">Appeler</a></li>
+            <li><a href="mailto:info@carclean.ch">info@carclean.ch</a></li>
+            <li><span>Zurich, Suisse</span></li>
+          </ul>
+        </div>
+      </div>
+      <div className="footer__bottom">
+        <div className="container">
+          <p>© 2026 Car Clean. Tous droits réservés.</p>
+        </div>
+      </div>
+    </footer>
+  )
+}
+
+// ─── App ──────────────────────────────────────────────────────────────────────
+export default function App() {
+  return (
+    <>
+      <Navbar />
+      <main>
+        <Hero />
+        <Features />
+        <StatsBar />
+        <Services />
+        <BeforeAfter />
+        <HowItWorks />
+        <Reviews />
+        <FaqSection />
+        <CtaSection />
+      </main>
+      <Footer />
+    </>
+  )
+}
