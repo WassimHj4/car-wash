@@ -38,7 +38,7 @@ function Navbar() {
   return (
     <header className={`nav${scrolled ? ' nav--scrolled' : ''}`}>
       <div className="nav__inner container">
-        <a href="#top" className="nav__logo">Car Clean</a>
+        <a href="#top" className="nav__logo">Infinity Clean</a>
         <nav className={`nav__menu${open ? ' nav__menu--open' : ''}`}>
           <a href="#services" onClick={close}>Services</a>
           <a href="#tarifs" onClick={close}>Tarifs</a>
@@ -445,17 +445,56 @@ function HowItWorks() {
 }
 
 // ─── Reviews ──────────────────────────────────────────────────────────────────
-const REVIEWS = [
-  { name: 'Marc D.', rating: 5, text: "Service impeccable ! La voiture brille comme neuve. Je recommande vivement à tous ceux qui cherchent un résultat professionnel sans se déplacer." },
-  { name: 'Sophie L.', rating: 5, text: "Intervention rapide et soignée. Les techniciens sont ponctuels et le résultat dépasse toutes mes attentes. Je reviendrai sans hésiter !" },
-  { name: 'Thomas K.', rating: 5, text: "Le nettoyage premium vaut chaque franc suisse. Mon SUV ressemble à un véhicule neuf sorti du showroom. Travail vraiment remarquable." },
-  { name: 'Isabelle R.', rating: 5, text: "Très professionnel, ponctuels et courtois. L'intérieur de ma voiture n'a jamais été aussi propre. Je suis totalement conquise." },
-  { name: 'Julien M.', rating: 5, text: "Parfait de A à Z. Contact simple, équipe à l'heure, travail remarquable. Paiement après intervention – un vrai gage de confiance." },
-  { name: 'Claire B.', rating: 5, text: "Excellent rapport qualité-prix. Résultat visible immédiatement. Je suis bluffée par le niveau de soin apporté à chaque détail." },
-]
+const API_BASE = 'https://carwash-backend-fsvi.onrender.com'
 
 function Reviews() {
   const [ref, inView] = useInView()
+  const [reviews, setReviews] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  // Submit-a-review form state
+  const [form, setForm] = useState({ name: '', rating: 5, text: '' })
+  const [submitStatus, setSubmitStatus] = useState(null) // null | 'loading' | 'success' | 'error'
+  const [showForm, setShowForm] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    setLoading(true)
+    fetch(`${API_BASE}/api/reviews`)
+      .then(res => {
+        if (!res.ok) throw new Error('Erreur serveur')
+        return res.json()
+      })
+      .then(data => setReviews(data))
+      .catch(() => setError('Impossible de charger les avis.'))
+      .finally(() => setLoading(false))
+  }, [refreshKey])
+
+  const handleChange = e => {
+    const { name, value } = e.target
+    setForm(f => ({ ...f, [name]: name === 'rating' ? Number(value) : value }))
+  }
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    setSubmitStatus('loading')
+    try {
+      const res = await fetch(`${API_BASE}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) throw new Error('Server error')
+      setSubmitStatus('success')
+      setForm({ name: '', rating: 5, text: '' })
+      setShowForm(false)
+      setRefreshKey(k => k + 1)
+    } catch {
+      setSubmitStatus('error')
+    }
+  }
+
   return (
     <section className="reviews section" id="avis" ref={ref}>
       <div className="container">
@@ -464,15 +503,97 @@ function Reviews() {
           <h2>Noté 5★ par<br />nos clients.</h2>
           <p className="section__sub">5.0 / 5 · Basé sur 200+ interventions à Zurich</p>
         </div>
+        {loading && <p className="reviews__status">Chargement des avis…</p>}
+        {error && <p className="reviews__status">{error}</p>}
+        {!loading && !error && reviews.length === 0 && (
+          <p className="reviews__status">Aucun avis pour le moment.</p>
+        )}
         <div className={`reviews__grid${inView ? ' visible' : ''}`}>
-          {REVIEWS.map((r, i) => (
-            <div key={r.name} className="review" style={{ '--delay': `${i * 0.08}s` }}>
-              <div className="review__stars">{'★'.repeat(r.rating)}</div>
-              <p>&ldquo;{r.text}&rdquo;</p>
-              <strong>— {r.name}</strong>
-            </div>
-          ))}
+          {reviews.map((r, i) => {
+            const initials = r.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+            return (
+              <div key={r.id} className="review" style={{ '--delay': `${i * 0.08}s` }}>
+                <div className="review__header">
+                  <div className="review__avatar">{initials}</div>
+                  <div>
+                    <strong className="review__name">{r.name}</strong>
+                    <div className="review__stars">{'★'.repeat(r.rating)}{'☆'.repeat(5 - r.rating)}</div>
+                  </div>
+                  <svg className="review__badge" viewBox="0 0 24 24" width="20" height="20" aria-label="Client vérifié">
+                    <path fill="#4285F4" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5l-4-4 1.41-1.41L10 13.67l6.59-6.59L18 8.5l-8 8z"/>
+                  </svg>
+                </div>
+                <p className="review__text">&ldquo;{r.text}&rdquo;</p>
+              </div>
+            )
+          })}
         </div>
+
+        <div className="reviews__cta">
+          <button className="btn btn--dark" onClick={() => setShowForm(v => !v)}>
+            {showForm ? 'Annuler' : 'Laisser un avis'}
+          </button>
+        </div>
+
+        {showForm && (
+          <form className="review-form" onSubmit={handleSubmit} noValidate>
+            <div className="contact__field">
+              <label htmlFor="review-name">Nom *</label>
+              <input
+                id="review-name"
+                name="name"
+                type="text"
+                placeholder="Votre nom"
+                value={form.name}
+                onChange={handleChange}
+                required
+                minLength={2}
+                maxLength={100}
+              />
+            </div>
+            <div className="contact__field">
+              <label htmlFor="review-rating">Note *</label>
+              <div className="review-form__stars">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <button
+                    key={n}
+                    type="button"
+                    className={`review-form__star${form.rating >= n ? ' active' : ''}`}
+                    onClick={() => setForm(f => ({ ...f, rating: n }))}
+                    aria-label={`${n} étoile${n > 1 ? 's' : ''}`}
+                  >★</button>
+                ))}
+              </div>
+            </div>
+            <div className="contact__field">
+              <label htmlFor="review-text">Votre avis *</label>
+              <textarea
+                id="review-text"
+                name="text"
+                rows={4}
+                placeholder="Décrivez votre expérience…"
+                value={form.text}
+                onChange={handleChange}
+                required
+                minLength={10}
+                maxLength={1000}
+              />
+            </div>
+            {submitStatus === 'success' && (
+              <p className="contact__feedback contact__feedback--success">
+                ✓ Merci ! Votre avis sera publié après validation.
+              </p>
+            )}
+            {submitStatus === 'error' && (
+              <p className="contact__feedback contact__feedback--error">
+                Une erreur est survenue. Veuillez réessayer.
+              </p>
+            )}
+            <button className="btn btn--dark" type="submit" disabled={submitStatus === 'loading'}>
+              {submitStatus === 'loading' ? 'Envoi…' : 'Envoyer mon avis'}
+            </button>
+          </form>
+        )}
       </div>
     </section>
   )
@@ -536,6 +657,116 @@ function FaqSection() {
   )
 }
 
+// ─── Contact Form ─────────────────────────────────────────────────────────────
+function ContactSection() {
+  const [ref, inView] = useInView()
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
+  const [status, setStatus] = useState(null) // 'loading' | 'success' | 'error'
+
+  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+
+  const handleSubmit = async e => {
+    e.preventDefault()
+    setStatus('loading')
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (!res.ok) throw new Error('Server error')
+      setStatus('success')
+      setForm({ name: '', email: '', phone: '', message: '' })
+    } catch {
+      setStatus('error')
+    }
+  }
+
+  return (
+    <section className="contact section section--grey" id="contact" ref={ref}>
+      <div className="container">
+        <div className="section__header">
+          <span className="section__tag">Nous contacter</span>
+          <h2>Envoyez-nous<br />un message.</h2>
+          <p className="section__sub">Nous vous répondons dans les plus brefs délais.</p>
+        </div>
+        <form
+          className={`contact__form${inView ? ' visible' : ''}`}
+          onSubmit={handleSubmit}
+          noValidate
+        >
+          <div className="contact__row">
+            <div className="contact__field">
+              <label htmlFor="name">Nom *</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                placeholder="Votre nom"
+                value={form.name}
+                onChange={handleChange}
+                required
+                minLength={2}
+                maxLength={100}
+              />
+            </div>
+            <div className="contact__field">
+              <label htmlFor="email">Email *</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="votre@email.com"
+                value={form.email}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          <div className="contact__field">
+            <label htmlFor="phone">Téléphone (optionnel)</label>
+            <input
+              id="phone"
+              name="phone"
+              type="tel"
+              placeholder="+41 79 000 00 00"
+              value={form.phone}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="contact__field">
+            <label htmlFor="message">Message *</label>
+            <textarea
+              id="message"
+              name="message"
+              rows={5}
+              placeholder="Décrivez votre besoin…"
+              value={form.message}
+              onChange={handleChange}
+              required
+              minLength={10}
+              maxLength={2000}
+            />
+          </div>
+          {status === 'success' && (
+            <p className="contact__feedback contact__feedback--success">
+              ✓ Message envoyé ! Nous vous répondrons rapidement.
+            </p>
+          )}
+          {status === 'error' && (
+            <p className="contact__feedback contact__feedback--error">
+              Une erreur est survenue. Veuillez réessayer.
+            </p>
+          )}
+          <button className="btn btn--dark" type="submit" disabled={status === 'loading'}>
+            {status === 'loading' ? 'Envoi en cours…' : 'Envoyer le message'}
+          </button>
+        </form>
+      </div>
+    </section>
+  )
+}
+
 // ─── CTA ──────────────────────────────────────────────────────────────────────
 function CtaSection() {
   const [ref, inView] = useInView()
@@ -564,22 +795,32 @@ function Footer() {
     <footer className="footer">
       <div className="container footer__inner">
         <div className="footer__brand">
-          <span className="footer__logo">Car Clean</span>
+          <span className="footer__logo">Infinity Clean</span>
           <p>Service premium de nettoyage voiture à domicile à Zurich et ses alentours.</p>
           <a href="tel:+393515162288" className="footer__phone">+39 351 516 2288</a>
-          <a
-            href="https://www.instagram.com/Infinityclean.ch"
-            target="_blank"
-            rel="noreferrer"
-            className="footer__instagram"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" aria-hidden="true">
-              <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-              <circle cx="12" cy="12" r="4" />
-              <circle cx="17.5" cy="6.5" r="1" fill="currentColor" strokeWidth="0" />
-            </svg>
-            @Infinityclean.ch
-          </a>
+          <div className="footer__socials">
+            <a href="https://www.instagram.com/Infinityclean.ch" target="_blank" rel="noreferrer" className="footer__social-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" aria-hidden="true">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <circle cx="12" cy="12" r="4" />
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor" strokeWidth="0" />
+              </svg>
+              @Infinityclean.ch
+            </a>
+            <a href="https://www.tiktok.com/@infinity.clean7" target="_blank" rel="noreferrer" className="footer__social-link">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.74a4.85 4.85 0 0 1-1.01-.05z"/>
+              </svg>
+              @infinity.clean7
+            </a>
+            <a href="mailto:infinityclean.ch@gmail.com" className="footer__social-link">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" width="18" height="18" aria-hidden="true">
+                <rect x="2" y="4" width="20" height="16" rx="2" />
+                <path d="M2 7l10 7 10-7" />
+              </svg>
+              infinityclean.ch@gmail.com
+            </a>
+          </div>
         </div>
         <div className="footer__nav">
           <h4>Navigation</h4>
@@ -595,17 +836,16 @@ function Footer() {
           <h4>Contact</h4>
           <ul>
             <li><a href="tel:+393515162288">Appeler</a></li>
-            <li><a href="mailto:info@carclean.ch">info@carclean.ch</a></li>
-            <li>
-              <a href="https://www.instagram.com/Infinityclean.ch" target="_blank" rel="noreferrer">Instagram</a>
-            </li>
+            <li><a href="mailto:infinityclean.ch@gmail.com">infinityclean.ch@gmail.com</a></li>
+            <li><a href="https://www.instagram.com/Infinityclean.ch" target="_blank" rel="noreferrer">Instagram</a></li>
+            <li><a href="https://www.tiktok.com/@infinity.clean7" target="_blank" rel="noreferrer">TikTok</a></li>
             <li><span>Zurich, Suisse</span></li>
           </ul>
         </div>
       </div>
       <div className="footer__bottom">
         <div className="container">
-          <p>© 2026 Car Clean. Tous droits réservés.</p>
+          <p>© 2026 Infinity Clean. Tous droits réservés.</p>
         </div>
       </div>
     </footer>
@@ -626,6 +866,7 @@ export default function App() {
         <HowItWorks />
         <Reviews />
         <FaqSection />
+        <ContactSection />
         <CtaSection />
       </main>
       <Footer />
