@@ -431,7 +431,7 @@ function HowItWorks() {
 }
 
 // ─── Reviews ──────────────────────────────────────────────────────────────────
-const API_BASE = 'https://carwash-backend-fsvi.onrender.com'
+const API_BASE = 'https://carwash-backend-production-4339.up.railway.app'
 
 function Reviews() {
   const [ref, inView] = useInView()
