@@ -76,12 +76,12 @@ function Hero() {
       <div className="hero__inner container">
         <div className="hero__badge">
           <span className="hero__stars" aria-hidden="true">★★★★★</span>{' '}
-          5.0 Google &nbsp;·&nbsp; 200+ véhicules traités à Zurich
+          5.0 Google &nbsp;·&nbsp; Canton Vaud &amp; Suisse Romande
         </div>
         <h1 className="hero__title">
           Nettoyage voiture<br />
           <em>à domicile</em><br />
-          à Zurich.
+          dans le Canton Vaud.
         </h1>
         <p className="hero__sub">
           Un soin professionnel, directement chez vous.<br />
@@ -89,7 +89,7 @@ function Hero() {
         </p>
         <div className="hero__actions">
           <a href="tel:+393515162288" className="btn btn--light btn--lg">
-            Nous appeler · dès CHF 110.–
+            Nous appeler · dès CHF 75.–
           </a>
           <a href="#services" className="btn btn--ghost btn--lg">
             Découvrir nos services
@@ -200,51 +200,41 @@ function StatsBar() {
 // ─── Services / Pricing ───────────────────────────────────────────────────────
 const PLANS = [
   {
-    name: 'Nettoyage Simple',
-    price: 'CHF 110.–',
-    duration: '~1h',
-    desc: 'Idéal pour un entretien régulier de votre véhicule.',
+    name: 'Basic',
+    duration: '~1h30',
+    desc: 'Nettoyage intérieur soigné pour redonner à votre voiture une propreté parfaite.',
     features: [
       "Aspiration complète de l'habitacle",
-      'Nettoyage du tableau de bord',
-      'Nettoyage du coffre',
+      'Nettoyage du tableau de bord & coffre',
       'Vitres intérieures',
+      'Dégraissage des plastiques',
     ],
-    options: ['Shampoing des sièges', 'Shampoing des tapis', 'Nettoyage extérieur'],
-    cta: 'Demander ce nettoyage',
+    sizes: [
+      { label: 'Petite voiture', price: 'CHF 75.–' },
+      { label: 'Moyenne voiture', price: 'CHF 90.–' },
+      { label: 'Grande voiture', price: 'CHF 110.–' },
+    ],
+    cta: 'Demander le Basic',
     featured: false,
   },
   {
-    name: 'Entretien Premium',
-    price: 'CHF 249.–',
+    name: 'Detailing',
     duration: '~3h',
-    desc: 'Pour une remise à neuf complète, sans compromis.',
+    desc: 'Traitement complet avec produits professionnels pour un résultat showroom.',
     features: [
-      'Tout le contenu du Simple',
-      'Shampoing en profondeur',
+      'Tout le contenu du Basic',
+      'Shampoing sièges & tapis en profondeur',
       'Traitement cuir & alcantara',
       'Nettoyage vapeur des vitres',
       'Désinfection & parfum durable',
     ],
-    options: ["Retrait des poils d'animaux", 'Suppression des mauvaises odeurs'],
-    cta: 'Demander le Premium',
-    featured: true,
-  },
-  {
-    name: 'Protection Céramique',
-    price: "CHF 1'190.–",
-    duration: '~1 journée',
-    desc: 'Un bouclier invisible pour protéger votre carrosserie 2 à 5 ans.',
-    features: [
-      'Décontamination complète',
-      'Polissage de préparation',
-      'Revêtement céramique Gtechniq',
-      'Effet hydrophobe ultra-performant',
-      'Protection UV longue durée',
+    sizes: [
+      { label: 'Petite voiture', price: 'CHF 100.–' },
+      { label: 'Moyenne voiture', price: 'CHF 120.–' },
+      { label: 'Grande voiture', price: 'CHF 150.–' },
     ],
-    options: [],
-    cta: 'Demander un devis',
-    featured: false,
+    cta: 'Demander le Detailing',
+    featured: true,
   },
 ]
 
@@ -257,10 +247,10 @@ function Services() {
           <span className="section__tag">Nos formules</span>
           <h2>Choisissez votre<br />niveau de soin.</h2>
           <p className="section__sub">
-            Chaque formule est conçue pour vous offrir le meilleur résultat selon l&apos;état de votre véhicule.
+            Tarifs selon la taille du véhicule. Chaque formule est réalisée à domicile avec des produits professionnels.
           </p>
         </div>
-        <div className={`plans__grid${inView ? ' visible' : ''}`}>
+        <div className={`plans__grid plans__grid--2${inView ? ' visible' : ''}`}>
           {PLANS.map((plan, i) => (
             <div
               key={plan.name}
@@ -272,8 +262,13 @@ function Services() {
                 <h3>{plan.name}</h3>
                 <p>{plan.desc}</p>
               </div>
-              <div className="plan__price">
-                <span>Dès {plan.price}</span>
+              <div className="plan__sizes">
+                {plan.sizes.map((s) => (
+                  <div key={s.label} className="plan__size-row">
+                    <span className="plan__size-label">{s.label}</span>
+                    <span className="plan__size-price">{s.price}</span>
+                  </div>
+                ))}
                 <small>Durée estimée {plan.duration}</small>
               </div>
               <ul className="plan__features">
@@ -286,21 +281,6 @@ function Services() {
                   </li>
                 ))}
               </ul>
-              {plan.options.length > 0 && (
-                <div className="plan__options">
-                  <p>Options disponibles</p>
-                  <ul>
-                    {plan.options.map((o) => (
-                      <li key={o}>
-                        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
-                          <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                        </svg>
-                        {o}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
               <a
                 href="tel:+393515162288"
                 className={`btn ${plan.featured ? 'btn--dark' : 'btn--outline'} btn--full`}
@@ -314,6 +294,12 @@ function Services() {
           <span>✓ Paiement après intervention</span>
           <span>✓ Confirmation sous 2h</span>
           <span>✓ Intervention à domicile</span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14" style={{verticalAlign:'middle', marginRight:'5px'}}>
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            Canton Vaud &amp; Suisse Romande
+          </span>
         </div>
       </div>
     </section>
@@ -501,7 +487,7 @@ function Reviews() {
         <div className="section__header">
           <span className="section__tag">Avis clients</span>
           <h2>Noté 5★ par<br />nos clients.</h2>
-          <p className="section__sub">5.0 / 5 · Basé sur 200+ interventions à Zurich</p>
+          <p className="section__sub">5.0 / 5 · Canton Vaud &amp; Suisse Romande</p>
         </div>
         {loading && <p className="reviews__status">Chargement des avis…</p>}
         {error && <p className="reviews__status">{error}</p>}
@@ -614,8 +600,8 @@ const FAQS = [
     a: "Le paiement s'effectue uniquement après l'intervention et votre satisfaction. Nous acceptons Twint, virement bancaire ou espèces.",
   },
   {
-    q: "Intervenez-vous dans tout Zurich ?",
-    a: "Oui, nous intervenons dans tout Zurich et ses alentours. Pour les zones plus éloignées, des frais de déplacement peuvent s'appliquer selon la distance.",
+    q: "Dans quelle zone intervenez-vous ?",
+    a: "Nous intervenons dans le Canton de Vaud et toute la Suisse Romande. Pour les zones éloignées, des frais de déplacement peuvent s'appliquer selon la distance.",
   },
   {
     q: "Faut-il une prise électrique ou de l'eau ?",
